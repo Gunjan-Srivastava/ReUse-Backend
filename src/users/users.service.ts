@@ -13,11 +13,20 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    // Never store the raw password. bcrypt.hash() one-way scrambles it —
+    // this can be checked against later, but never reversed back to the
+    // original text. "10" is the salt rounds (scrambling strength).
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+    // Spread all the DTO's fields in first (...createUserDto), THEN
+    // override "password" with the hashed version. Order matters here:
+    // whichever value is written LAST for a given field wins, so the
+    // hashed password must come after the spread, not before.
     const user = this.usersRepository.create({
       ...createUserDto,
       password: hashedPassword,
     });
+
     return this.usersRepository.save(user);
   }
 }
