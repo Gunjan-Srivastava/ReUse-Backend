@@ -32,38 +32,103 @@ describe('ListingsService', () => {
     expect(mockRepository.find).toHaveBeenCalled();
   });
 
-  it('create should save and return a new listing',async()=>{
-    // Fake Input data 
-    const fakeDto = { title: 'Test Phone', description: 'Test Description', price: 5000, imageUrl:'./x.jpg' };
-   
-    // what repository.create() would build in memory (usually just the same data, maybe with a fake id added)
+  it('create should save and return a new listing', async () => {
+    const fakeDto = { title: 'Test Phone', description: 'Test Description', price: 5000, imageUrl: './x.jpg' };
     const fakeBuiltListing = { ...fakeDto };
-  
-
-    // 3. what repository.save() would return after "saving" (often the same object, now with an id)
     const fakeSavedListing = { id: 1, ...fakeDto };
 
-    //setup Mock repo
     const mockRepository = {
-    create: vi.fn().mockReturnValue(fakeBuiltListing),
-    save: vi.fn().mockResolvedValue(fakeSavedListing),
-};
-    const module= await Test.createTestingModule({
+      create: vi.fn().mockReturnValue(fakeBuiltListing),
+      save: vi.fn().mockResolvedValue(fakeSavedListing),
+    };
+    const module = await Test.createTestingModule({
       providers: [
         ListingsService,
         {
           provide: getRepositoryToken(Listing),
           useValue: mockRepository,
-        }
-      ]
+        },
+      ],
     }).compile();
-    const service= module.get(ListingsService);
+    const service = module.get(ListingsService);
 
-    const result= await service.create(fakeBuiltListing);
-        
+    const result = await service.create(fakeBuiltListing);
+
     expect(result).toEqual(fakeSavedListing);
-        expect(mockRepository.create).toHaveBeenCalledWith(fakeBuiltListing);
+    expect(mockRepository.create).toHaveBeenCalledWith(fakeBuiltListing);
+  });
+
+  it('update should update the listing and return the fresh version', async () => {
+    // The fake data the client sends — only the field(s) being changed.
+    const fakeUpdateDto = { price: 5000 };
+
+    // The full, already-updated listing the database would hand back.
+    const fakeUpdatedListing = {
+      id: 1,
+      title: 'iPhone 14',
+      description: 'Barely used',
+      price: 5000,
+      imageUrl: 'x.jpg',
+      status: 'Available',
+    };
+
+    // Two fake functions, matching the two real Repository calls inside
+    // ListingsService.update(). Both are async, so both use mockResolvedValue.
+    const mockRepository = {
+      update: vi.fn().mockResolvedValue({}),
+      findOneBy: vi.fn().mockResolvedValue(fakeUpdatedListing),
+    };
+
+    const module = await Test.createTestingModule({
+      providers: [
+        ListingsService,
+        {
+          provide: getRepositoryToken(Listing),
+          useValue: mockRepository,
+        },
+      ],
+    }).compile();
+    const service = module.get(ListingsService);
+
+    // Call the Service exactly like the Controller does: update(id, dto).
+    const result = await service.update(1, fakeUpdateDto);
+
+    // The Service must return the fresh, fully-updated listing.
+    expect(result).toEqual(fakeUpdatedListing);
+
+    // update() must have been called with the correct id AND the correct DTO.
+    expect(mockRepository.update).toHaveBeenCalledWith(1, fakeUpdateDto);
+
+    // findOneBy() must have been called looking up the same id.
+    expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 1 });
+  });
+
+  it('remove should delete the listing', async() => {
+
+    const fakeDeleteResult = 
+      { raw: [], affected:1 };
 
     
-  })
+    const mockRepository = {
+      delete: vi.fn().mockResolvedValue(fakeDeleteResult),
+    };
+
+    const module = await Test.createTestingModule({
+      providers: [
+        ListingsService,
+        {
+          provide: getRepositoryToken(Listing),
+          useValue: mockRepository,
+        },
+      ],
+    }).compile();
+
+    const service = module.get(ListingsService);
+
+    const result = await service.remove(1);
+
+    expect(result).toEqual(fakeDeleteResult);
+
+    expect(mockRepository.delete).toHaveBeenCalledWith(1);
+  });
 });
