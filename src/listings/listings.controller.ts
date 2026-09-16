@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common'
 import { ListingsService } from './listings.service.js';
 import { CreateListingDto } from './create-listing.dto.js';
 import { UpdateListingDto } from './update-listing.dto.js';
+//import { NotFoundException } from '@nestjs/common';
 
 // @Controller('listings') means every route here starts with /listings
 @Controller('listings')
@@ -14,6 +15,11 @@ export class ListingsController {
   @Get()
   findAll() {
     return this.listingsService.findAll();
+  }
+  // GET /Listings - fetch one row
+  @Get(':id')
+  findOne(@Param('id') id: string){
+    return this.listingsService.findOne(+id)
   }
 
   // POST /listings — create a new listing

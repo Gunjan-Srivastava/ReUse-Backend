@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Listing } from './listing.entity.js';
 import { CreateListingDto } from './create-listing.dto.js';
 import { UpdateListingDto } from './update-listing.dto.js';
+//import { NotFoundException } from '@nestjs/common';
 
 // @Injectable() marks this class as a Service NestJS can create once and
 // hand out anywhere it's needed (Dependency Injection).
@@ -19,6 +20,17 @@ export class ListingsService {
   // Get every row from the listing table.
   findAll() {
     return this.listingsRepository.find();
+  
+  }
+
+  // Get a row from the Listing Table
+  async findOne(id: number) {
+      const listing =await this.listingsRepository.findOneBy({ id });
+      if (listing==null){
+        throw new NotFoundException(`Listing with id ${id} not found`);
+      }else 
+        return listing;
+      
   }
 
   // Create a new listing.
