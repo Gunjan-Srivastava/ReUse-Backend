@@ -1,5 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Column, CreateDateColumn, Entity,ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from '../users/user.entity.js';
 // @Entity() marks this class as a database table blueprint.
 // TypeORM will create/manage a "listing" table matching these fields.
 @Entity()
@@ -36,4 +36,9 @@ export class Listing {
   // set manually.
   @CreateDateColumn()
   createdAt: Date;
+  
+  // Many listings can belong to one User — this creates a foreign key
+// column behind the scenes, linking this listing to its owner.
+@ManyToOne(() => User)
+owner: User;
 }

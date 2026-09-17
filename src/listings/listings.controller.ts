@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common'
 import { ListingsService } from './listings.service.js';
 import { CreateListingDto } from './create-listing.dto.js';
 import { UpdateListingDto } from './update-listing.dto.js';
-
+import { Req } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard.js';
 import { UseGuards } from '@nestjs/common';
-
+import type { Request } from 'express';
 
 // @Controller('listings') means every route here starts with /listings
 @Controller('listings')
@@ -29,8 +29,9 @@ export class ListingsController {
   // @Body() pulls the incoming JSON, validated against CreateListingDto
   @Post()
   @UseGuards(AuthGuard)
-  create(@Body() createListingDto: CreateListingDto) {
-    return this.listingsService.create(createListingDto);
+  create(@Body() createListingDto: CreateListingDto, @Req() request: Request) {
+   const userId=(request as any).user.userId;
+    return this.listingsService.create(createListingDto, userId);
   }
 
   // PUT /listings/:id — update one existing listing

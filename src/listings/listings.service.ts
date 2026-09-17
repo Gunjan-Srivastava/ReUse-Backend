@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { Listing } from './listing.entity.js';
 import { CreateListingDto } from './create-listing.dto.js';
 import { UpdateListingDto } from './update-listing.dto.js';
-//import { NotFoundException } from '@nestjs/common';
 
 // @Injectable() marks this class as a Service NestJS can create once and
 // hand out anywhere it's needed (Dependency Injection).
@@ -36,8 +35,10 @@ export class ListingsService {
   // Create a new listing.
   // .create() just builds the object in memory (not saved yet).
   // .save() actually writes it into the database.
-  create(createListingDto: CreateListingDto) {
-    const listing = this.listingsRepository.create(createListingDto);
+  create(createListingDto: CreateListingDto, userId: number) {
+    const listing = this.listingsRepository.create({...createListingDto, 
+      owner: {id: userId},
+   } );
     return this.listingsRepository.save(listing);
   }
 
