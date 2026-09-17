@@ -28,6 +28,7 @@ export class ListingsController {
   // POST /listings — create a new listing
   // @Body() pulls the incoming JSON, validated against CreateListingDto
   @Post()
+  @UseGuards(AuthGuard)
   create(@Body() createListingDto: CreateListingDto) {
     return this.listingsService.create(createListingDto);
   }
@@ -36,6 +37,7 @@ export class ListingsController {
   // @Param('id') pulls the id straight out of the URL (always arrives as
   // text, hence the "+id" conversion to a number below)
   @Put(':id')
+    @UseGuards(AuthGuard)
   update(@Param('id') id: string, @Body() updateListingDto: UpdateListingDto) {
     return this.listingsService.update(+id, updateListingDto);
   }
