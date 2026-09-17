@@ -4,6 +4,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { ListingsModule } from './listings/listings.module.js';
 import { UsersModule } from './users/users.module.js';
+import { AuthModule } from './auth/auth.module.js';
 
 // The root Module — every feature Module gets registered here.
 @Module({
@@ -25,6 +26,7 @@ import { UsersModule } from './users/users.module.js';
     }),
     ListingsModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
