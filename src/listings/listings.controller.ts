@@ -2,7 +2,10 @@ import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common'
 import { ListingsService } from './listings.service.js';
 import { CreateListingDto } from './create-listing.dto.js';
 import { UpdateListingDto } from './update-listing.dto.js';
-//import { NotFoundException } from '@nestjs/common';
+
+import { AuthGuard } from '../auth/auth.guard.js';
+import { UseGuards } from '@nestjs/common';
+
 
 // @Controller('listings') means every route here starts with /listings
 @Controller('listings')
@@ -40,6 +43,7 @@ export class ListingsController {
   // DELETE /listings/:id — remove one listing
   // No DTO needed here — deleting only requires knowing WHICH id, no body data
   @Delete(':id')
+  @UseGuards(AuthGuard)
   async remove(@Param('id') id: string) {
     return this.listingsService.remove(+id);
   }
